@@ -1,7 +1,5 @@
 class CanvasService {
   constructor(canvas) {
-    // Initialization of variables
-
     // Canvas
     this.canvas = canvas;
     this.ctx = this.canvas.getContext("2d");
@@ -11,39 +9,31 @@ class CanvasService {
     this.y = this.canvas.height - 30;
     this.dx = 2;
     this.dy = -2;
-
     // Paddle
     this.paddleHeight = 10;
-    this.paddleWidth = 85;
+    this.paddleWidth = 100;
     this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
-
     // Bricks
     this.brickRowCount = 4;
     this.brickColumnCount = 13;
-    this.brickWidth = this.canvas.width / (this.brickColumnCount + 1) + 5;
+    this.brickWidth = this.canvas.width / (this.brickColumnCount + 1);
     this.brickHeight = 20;
-    this.brickPadding = 5;
+    this.brickPadding = 4;
     this.brickOffsetTop = 30;
     this.brickOffsetLeft = 5;
-
-
+    this.createBricks();
+    // Acceleration factor
     this.accelerationFactor = 1.05;
-
     // Score
     this.score = 0;
     // Lives
     this.lives = 3;
-
-    // Création du tableau de briques
-    this.createBricks();
-
+    // Game over
     this.gameOverNotify = document.querySelector(".game-over-notify");
     this.gameOverNotify.addEventListener("click", function () {
       document.location.reload();
     });
-
     this.interval = null;
-
     // Leaderboard
     this.leaderboard = [];
     const savedLeaderboard = localStorage.getItem("leaderboard");
@@ -52,11 +42,12 @@ class CanvasService {
     }
     this.displayLeaderboard();
   }
+
   // function to draw the ball
   drawBall() {
     this.ctx.beginPath();
     this.ctx.arc(this.x, this.y, this.ballRadius, 0, Math.PI * 2);
-    this.ctx.fillStyle = this.ballColor || "#0095DD"; // Use the new color or default color
+    this.ctx.fillStyle = this.ballColor || "#0095DD"; 
     this.ctx.fill();
     this.ctx.closePath();
   }
@@ -65,12 +56,7 @@ class CanvasService {
   drawPaddle() {
     this.ctx.beginPath();
     const paddleY = this.canvas.height - this.paddleHeight - 10;
-    this.ctx.rect(
-      this.paddleX,
-      paddleY,
-      this.paddleWidth,
-      this.paddleHeight
-    );
+    this.ctx.rect(this.paddleX, paddleY, this.paddleWidth, this.paddleHeight);
     //red color
     this.ctx.fillStyle = "#FF0000";
     this.ctx.fill();
@@ -86,6 +72,7 @@ class CanvasService {
     }
   }
 
+  //function to create the bricks
   createBricks() {
     this.bricks = [];
     for (let c = 0; c < this.brickColumnCount; c++) {
@@ -95,7 +82,7 @@ class CanvasService {
           c * (this.brickWidth + this.brickPadding) + this.brickOffsetLeft;
         const brickY =
           r * (this.brickHeight + this.brickPadding) + this.brickOffsetTop;
-        this.bricks[c][r] = { x: brickX, y: brickY, status: 1 };
+        this.bricks[c][r] = { x: brickX, y: brickY, status: 1, lives: 3 };
       }
     }
   }
@@ -104,16 +91,13 @@ class CanvasService {
   drawBricks() {
     for (let r = 0; r < this.brickRowCount; r++) {
       for (let c = 0; c < this.brickColumnCount; c++) {
-        if (this.bricks[c][r].status == 1) {
-          let brickX =
-            c * (this.brickWidth + this.brickPadding) + this.brickOffsetLeft;
-          let brickY =
-            r * (this.brickHeight + this.brickPadding) + this.brickOffsetTop;
-          this.bricks[c][r].x = brickX;
-          this.bricks[c][r].y = brickY;
+        let b = this.bricks[c][r];
+        if (b.status == 1) {
+          let brickX = b.x;
+          let brickY = b.y;
           this.ctx.beginPath();
           this.ctx.rect(brickX, brickY, this.brickWidth, this.brickHeight);
-          this.ctx.fillStyle = "#0095DD";
+          this.ctx.fillStyle = this.getBrickColor(b.lives); 
           this.ctx.fill();
           this.ctx.closePath();
         }
@@ -121,24 +105,45 @@ class CanvasService {
     }
   }
 
+  // Function to get the brick color based on lives
+  getBrickColor(lives) {
+    switch (lives) {
+      case 3:
+        return "#0095DD"; // Blue
+      case 2:
+        return "#FFA500"; // Orange
+      case 1:
+        return "#FF0000"; // Red
+      default:
+        return "#000000"; // Black
+    }
+  }
+
+  // Function to detect collision with the bricks
   collisionDetection() {
     for (let c = 0; c < this.brickColumnCount; c++) {
       for (let r = 0; r < this.brickRowCount; r++) {
         let b = this.bricks[c][r];
         if (b.status == 1) {
           if (
-            this.x > b.x &&
-            this.x < b.x + this.brickWidth &&
-            this.y > b.y &&
-            this.y < b.y + this.brickHeight
+            this.x + this.ballRadius > b.x &&
+            this.x - this.ballRadius < b.x + this.brickWidth &&
+            this.y + this.ballRadius > b.y &&
+            this.y - this.ballRadius < b.y + this.brickHeight
           ) {
-            if (this.y - this.dy <= b.y  ||  this.y - this.dy >= b.y + this.brickHeight) {
+            if (
+              this.y - this.dy <= b.y ||
+              this.y - this.dy >= b.y + this.brickHeight
+            ) {
               this.dy = -this.dy;
             } else {
-            this.dx = -this.dx;
+              this.dx = -this.dx;
             }
-            b.status = 0;
-            this.score++;
+            b.lives -= 1;
+            if (b.lives <= 0) {
+              b.status = 0; // Set status to 0 when no lives left
+              this.score++;
+            }
             this.ballColor = this.getRandomColor();
             if (this.score == this.brickRowCount * this.brickColumnCount) {
               alert("Vous avez gagné !");
@@ -168,7 +173,7 @@ class CanvasService {
     ) {
       this.dx = -this.dx;
     }
-    // Gestion des rebonds sur le mur supérieur
+    // Manage the ball's movements on the top wall
     if (this.y + this.dy < this.ballRadius) {
       this.dy = -this.dy;
     }
@@ -183,16 +188,18 @@ class CanvasService {
         let angle = (hitPosition * Math.PI) / 4 - Math.PI / 8;
         this.dx = 2 * Math.sin(angle);
         this.dy = -2 * Math.cos(angle);
-        this.accelerationFactor += 0.1;
+        this.accelerationFactor += 0.04;
         this.dx *= this.accelerationFactor;
         this.dy *= this.accelerationFactor;
       }
     }
 
-    // Vérifier si la balle touche le bas du canvas
+    // Manage the ball's movements on the bottom wall
     if (this.y + this.dy > this.canvas.height - this.ballRadius) {
       this.lives--;
       if (!this.lives) {
+        this.lives--;
+        this.drawLives();
         this.gameOver();
         return;
       } else {
@@ -207,6 +214,7 @@ class CanvasService {
     this.x += this.dx;
     this.y += this.dy;
   }
+
 
   drawScore() {
     this.ctx.font = "16px Arial";
@@ -249,19 +257,17 @@ class CanvasService {
       <tr>`;
       })
       .join("")
-      .slice(10)
-      ;
+      .slice(10);
   }
 
   getRandomColor() {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
+    const letters = "0123456789ABCDEF";
+    let color = "#";
     for (let i = 0; i < 6; i++) {
       color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
   }
-  
 
   //function to start drawing
   startDrawing() {
