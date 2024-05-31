@@ -1,4 +1,4 @@
-Breakout Game
+BrickOut Game
 
 Ce projet est une implémentation d'un jeu Breakout en JavaScript utilisant HTML5 Canvas.
 
