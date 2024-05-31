@@ -124,15 +124,15 @@ class CanvasService {
     }
   }
 
+  // function to detect the collision
   collisionDetection() {
     let ballHitBrick = false;
-    let linesDestroyed = 0; // Ajout d'un compteur pour les lignes détruites
+    let linesDestroyed = 0; 
     for (let r = 0; r < this.brickRowCount; r++) {
-      // Parcours des lignes
-      let bricksInLine = this.bricks.map((column) => column[r]); // Sélection des briques dans la ligne
+      let bricksInLine = this.bricks.map((column) => column[r]); 
+      // Check if all bricks in the line are destroyed
       if (bricksInLine.every((brick) => brick.status === 0)) {
-        // Vérifie si toutes les briques dans la ligne sont détruites
-        linesDestroyed++; // Incrémente le compteur de lignes détruites
+        linesDestroyed++;
       }
     }
 
@@ -174,10 +174,10 @@ class CanvasService {
       }
     }
 
-    // Ajout des points bonus pour les lignes détruites
+    // add bonus points for each line destroyed
     this.score += linesDestroyed * 10;
 
-    // Vérification de la condition de victoire après l'ajout des points bonus
+    // check if the player has won
     if (this.score >= this.brickRowCount * this.brickColumnCount + linesDestroyed * 10) {
       alert("Vous avez gagné !");
       this.stopDrawing();

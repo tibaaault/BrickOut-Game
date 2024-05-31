@@ -1,4 +1,3 @@
-// src/Components/Bonus.js
 class Bonus {
     constructor(x, y, type) {
       this.x = x;
