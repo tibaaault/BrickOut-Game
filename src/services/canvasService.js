@@ -160,7 +160,7 @@ class CanvasService {
               if (b.lives <= 0) {
                 b.status = 0;
                 this.score++;
-                if (Math.random() < 1) {
+                if (Math.random() < 0.3) {
                   this.createBonus(
                     b.x + this.brickWidth / 2,
                     b.y + this.brickHeight / 2
