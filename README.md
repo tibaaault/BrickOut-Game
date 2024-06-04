@@ -8,7 +8,7 @@ Le jeu se compose d'une balle rebondissante qui doit casser des briques en haut 
 
 Comment Jouer
 
-Ouvrez le fichier index.html dans votre navigateur web.
+Ouvrez le fichier index.html avec l'extension Live Server de Visual Studio Code ou un équivalent.
 Utilisez les touches gauche et droite pour déplacer la plate-forme.
 Cassez autant de briques que possible sans laisser la balle passer en dessous de la plate-forme.
 Le jeu se termine lorsque toutes les briques sont cassées ou lorsque toutes les vies sont perdues.
