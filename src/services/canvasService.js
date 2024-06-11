@@ -9,8 +9,8 @@ class CanvasService {
     this.ballRadius = 12;
     this.x = this.canvas.width / 2;
     this.y = this.canvas.height - 30;
-    this.dx = 5;
-    this.dy = -5;
+    this.dx = 2;
+    this.dy = -2;
     // Paddle
     this.paddleHeight = 10;
     this.paddleWidth = 100;
@@ -71,9 +71,9 @@ class CanvasService {
   // function to update the paddle position
   updatePaddlePosition(rightPressed, leftPressed) {
     if (rightPressed && this.paddleX < this.canvas.width - this.paddleWidth) {
-      this.paddleX += 7 * this.accelerationFactor;
+      this.paddleX += 2 * this.accelerationFactor;
     } else if (leftPressed && this.paddleX > 0) {
-      this.paddleX -= 7 * this.accelerationFactor;
+      this.paddleX -= 2 * this.accelerationFactor;
     }
   }
 
@@ -220,8 +220,8 @@ class CanvasService {
         if (this.x > this.paddleX && this.x < this.paddleX + this.paddleWidth) {
           let hitPosition = (this.x - this.paddleX) / this.paddleWidth;
           let angle = (hitPosition * Math.PI) / 4 - Math.PI / 8;
-          this.dx = 5 * Math.sin(angle);
-          this.dy = -5 * Math.cos(angle);
+          this.dx = 2 * Math.sin(angle);
+          this.dy = -2 * Math.cos(angle);
           this.accelerationFactor += 0.15;
           this.dx *= this.accelerationFactor;
           this.dy *= this.accelerationFactor;
@@ -238,8 +238,8 @@ class CanvasService {
       } else {
         this.x = this.canvas.width / 2;
         this.y = this.canvas.height - 30;
-        this.dx = 5;
-        this.dy = -5;
+        this.dx = 2;
+        this.dy = -2;
         this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
         this.accelerationFactor = 1.05;
       }
